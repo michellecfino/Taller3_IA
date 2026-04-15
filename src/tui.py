@@ -38,6 +38,7 @@ _CASE_MODULES = [
     "crimes.sabotaje_pharmax",
     "crimes.herencia_hacienda_rosal",
     "crimes.red_puerto_sombras",
+    "crimes.slenderman",
 ]
 
 _STATUS_STYLE = {
@@ -483,6 +484,7 @@ class CaseSelectorScreen(Screen):
         Binding("3", "select_case('2')", "Caso 3", show=False),
         Binding("4", "select_case('3')", "Caso 4", show=False),
         Binding("5", "select_case('4')", "Caso 5", show=False),
+        Binding("6", "select_case('5')", "Caso 6", show=False),
         Binding("enter", "open_selected", "Abrir", show=False),
     ]
 
@@ -496,7 +498,7 @@ class CaseSelectorScreen(Screen):
         yield Header(show_clock=True)
         yield Static(
             "  [bold #f0c040]DETECTIVE LÓGICA[/] — [dim]Taller de IA · Uniandes[/]\n"
-            "  [dim]Elige un caso para investigar  ·  teclas 1-5 o ↑↓ + Enter[/]",
+            "  [dim]Elige un caso para investigar  ·  teclas 1-6 o ↑↓ + Enter[/]",
             classes="title-bar",
         )
         with Container(id="selector-grid"):

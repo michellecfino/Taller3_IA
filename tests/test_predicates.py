@@ -13,6 +13,7 @@ from crimes.veneno_villa_espinas import CASE as veneno
 from src.backward_chaining import backward_chain
 from src.forward_chaining import forward_chain
 from src.predicate_logic import Predicate, Term
+from crimes.slenderman import CASE as slenderman
 
 
 # ---------------------------------------------------------------------------
@@ -188,6 +189,32 @@ class TestRedPuertoSombras:
         assert r_reportado.success, "Debe haber al menos un reportado para que el forall sea significativo"
         r = backward_chain(self.kb, self.case.queries[5].goal)
         assert r.success, self.case.queries[5].description
+# ---------------------------------------------------------------------------
+# 5. TestSlenderman - Bono :D
+# ---------------------------------------------------------------------------  
+        
+class TestSlenderman:
+    """Backward chaining: Pruebas para el caso de las niñas (Bono)."""
+
+    def setup_method(self) -> None:
+        self.case = slenderman
+        self.kb = self.case.create_kb()
+
+    def test_acto_cometido(self) -> None:
+        r = backward_chain(self.kb, self.case.queries[0].goal)
+        assert r.success, self.case.queries[0].description
+
+    def test_pacto_silencio(self) -> None:
+        r = backward_chain(self.kb, self.case.queries[1].goal)
+        assert r.success, self.case.queries[1].description
+
+    def test_influencia_slenderman(self) -> None:
+        r = backward_chain(self.kb, self.case.queries[2].goal)
+        assert r.success, self.case.queries[2].description
+
+    def test_inocencia_legal(self) -> None:
+        r = backward_chain(self.kb, self.case.queries[3].goal)
+        assert r.success, self.case.queries[3].description        
 
 
 # ---------------------------------------------------------------------------
@@ -261,6 +288,13 @@ class TestForwardChaining:
         descartados = {f for f in result.derived_facts if f.name == "descartado"}
         assert Predicate("descartado", (Term("inspector_nova"),)) in descartados
         assert Predicate("descartado", (Term("capitan_herrera"),)) in descartados
+    def test_slenderman_derivaciones(self) -> None:
+        kb = slenderman.create_kb()
+        result = forward_chain(kb)
+        # Verificamos que se derive que no son culpables legalmente
+        inocentes = {f for f in result.derived_facts if f.name == "inocente_legal"}
+        assert Predicate("inocente_legal", (Term("morgan"),)) in inocentes
+        assert Predicate("inocente_legal", (Term("anissa"),)) in inocentes    
 
 
 # ---------------------------------------------------------------------------

@@ -43,6 +43,102 @@ def crear_kb() -> KnowledgeBase:
 
     # === YOUR CODE HERE ===
 
+    # 1. Hechos (Registros y evidencias)
+    # Ubicación fuera del puerto (coartadas)
+    kb.add_fact(Predicate("registro_fuera_puerto", (capitan_herrera,)))
+    kb.add_fact(Predicate("registro_fuera_puerto", (inspector_nova,)))
+
+    # Evidencia contra Duarte
+    kb.add_fact(Predicate("firma_manifiestos_fraudulentos", (oficial_duarte,)))
+
+    # Evidencia contra Pinto
+    kb.add_fact(Predicate("visto_introduciendo_mercancia", (marinero_pinto,)))
+    kb.add_fact(Predicate("acceso_bodega", (marinero_pinto,)))
+
+    # Pertenencia al cartel y reportes
+    kb.add_fact(Predicate("pertenece_a", (oficial_duarte, cartel_portuario)))
+    kb.add_fact(Predicate("pertenece_a", (marinero_pinto, cartel_portuario)))
+    kb.add_fact(Predicate("reportado_informante", (oficial_duarte,)))
+    kb.add_fact(Predicate("reportado_informante", (marinero_pinto,)))
+
+    # Acusaciones
+    kb.add_fact(Predicate("acusa_a", (capitan_herrera, oficial_duarte)))
+
+    # 2. Reglas de Deducción
+    X = Term("$X")
+    Y = Term("$Y")
+    Red = Term("$Red")
+
+    # "Quien tiene registro oficial fuera del puerto está descartado."
+    kb.add_rule(Rule(
+        head=Predicate("descartado", (X,)),
+        body=(Predicate("registro_fuera_puerto", (X,)),)
+    ))
+
+    # "Quien firma manifiestos de carga fraudulentos comete fraude documental."
+    kb.add_rule(Rule(
+        head=Predicate("fraude_documental", (X,)),
+        body=(Predicate("firma_manifiestos_fraudulentos", (X,)),)
+    ))
+
+    # "Quien tiene acceso a la bodega y fue visto introduciendo mercancía ilegal introduce contrabando."
+    kb.add_rule(Rule(
+        head=Predicate("introduce_contrabando", (X,)),
+        body=(
+            Predicate("acceso_bodega", (X,)),
+            Predicate("visto_introduciendo_mercancia", (X,)),
+        )
+    ))
+
+    # "Quien comete fraude documental sin coartada es culpable."
+    kb.add_rule(Rule(
+        head=Predicate("culpable", (X,)),
+        body=(Predicate("fraude_documental", (X,)),)
+    ))
+
+    # "Quien introduce contrabando sin coartada es culpable."
+    kb.add_rule(Rule(
+        head=Predicate("culpable", (X,)),
+        body=(Predicate("introduce_contrabando", (X,)),)
+    ))
+
+    # "Dos personas comparten red si pertenecen al mismo cartel."
+    kb.add_rule(Rule(
+        head=Predicate("comparte_red", (X, Y)),
+        body=(
+            Predicate("pertenece_a", (X, Red)),
+            Predicate("pertenece_a", (Y, Red)),
+        )
+    ))
+
+    # "Si dos culpables comparten red, su actividad constituye una operación conjunta."
+    kb.add_rule(Rule(
+        head=Predicate("operacion_conjunta", (X, Y)),
+        body=(
+            Predicate("culpable", (X,)),
+            Predicate("culpable", (Y,)),
+            Predicate("comparte_red", (X, Y)),
+        )
+    ))
+
+    # "El testimonio de una persona descartada contra alguien es confiable."
+    kb.add_rule(Rule(
+        head=Predicate("testimonio_confiable", (X, Y)),
+        body=(
+            Predicate("descartado", (X,)),
+            Predicate("acusa_a", (X, Y)),
+        )
+    ))
+
+    # "Una red está activa si al menos uno de sus miembros es culpable."
+    kb.add_rule(Rule(
+        head=Predicate("red_activa", (Red,)),
+        body=(
+            Predicate("pertenece_a", (X, Red)),
+            Predicate("culpable", (X,)),
+        )
+    ))
+
     # === END YOUR CODE ===
 
     return kb
