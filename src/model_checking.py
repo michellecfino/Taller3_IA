@@ -8,7 +8,7 @@ Hint: Usa las funciones get_atoms() y evaluate() de logic_core.py.
 
 from __future__ import annotations
 
-from src.logic_core import Formula
+from src.logic_core import Formula, Not, And, Or, Implies, Iff, Atom
 
 
 def get_all_models(atoms: set[str]) -> list[dict[str, bool]]:
@@ -88,11 +88,9 @@ def check_valid(formula: Formula) -> bool:
           Alternativamente, verifica que sea verdadera en TODOS los modelos.
     """
     # === YOUR CODE HERE ===
-    atoms = formula.get_atoms()
-    for model in get_all_models(atoms):
-        if not formula.evaluate(model):
-            return False
-    return True
+    negacion = Not(formula)
+    satisfacible, _ = check_satisfiable(negacion)
+    return not satisfacible
     # === END YOUR CODE ===
 
 
@@ -117,14 +115,17 @@ def check_entailment(kb: list[Formula], query: Formula) -> bool:
           y la query sea falsa.
     """
     # === YOUR CODE HERE ===
-    all_atoms = set(query.get_atoms()) 
+    
+    all_atoms = set(query.get_atoms())
     for f in kb:
         all_atoms.update(f.get_atoms())
-    
+        
     for model in get_all_models(all_atoms):
-        kb_true = all(f.evaluate(model) for f in kb)
-        if kb_true and not query.evaluate(model):
+        kb_verdadera = all(f.evaluate(model) for f in kb)
+        
+        if kb_verdadera and not query.evaluate(model):
             return False
+            
     return True
     # === END YOUR CODE ===
 
